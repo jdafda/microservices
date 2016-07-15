@@ -1,1 +1,1 @@
-# microservices demo app to test spring boot features.
+# microservices demo apps to test spring boot features.
