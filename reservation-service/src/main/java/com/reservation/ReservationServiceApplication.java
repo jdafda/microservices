@@ -39,23 +39,23 @@ public class ReservationServiceApplication {
         };
     }
 }
+    /*
+    @RefreshScope
+    @RestController
+    class ReservationService {
 
-@RefreshScope
-@RestController
-class ReservationService {
+        @Value("${message}")
+        private String message;
 
-    @Value("${message}")
-    private String message;
+        @Autowired
+        private ReservationRepository reservationRepository;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
+        @RequestMapping(name = "/message", method = RequestMethod.GET)
+        public String message() {
+            return message;
+        }
 
-    @RequestMapping(name = "/message", method = RequestMethod.GET)
-    public String message() {
-        return message;
-    }
-
-}
+    }*/
 
 @RepositoryRestResource
 interface ReservationRepository extends JpaRepository<Reservation, Long> {
