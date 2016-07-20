@@ -31,7 +31,7 @@ public class ReservationClientApplication {
         SpringApplication.run(ReservationClientApplication.class, args);
     }
 
-    @LoadBalanced
+    @LoadBalanced // Service discovery will not work without this
     @Bean
     public RestTemplate restTemplate(){
         return new RestTemplate();
