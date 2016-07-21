@@ -1,9 +1,10 @@
 package com.reservation;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -19,9 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
+@EnableCircuitBreaker
 @EnableZuulProxy
 @EnableDiscoveryClient
 @SpringBootApplication
@@ -33,7 +35,7 @@ public class ReservationClientApplication {
 
     @LoadBalanced // Service discovery will not work without this
     @Bean
-    public RestTemplate restTemplate(){
+    public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
@@ -46,9 +48,14 @@ class ReservationApiGatewayRestController {
     @Autowired
     private RestTemplate restTemplate;
 
+    public Collection<String> getReservationNamesFallback() {
+        return Collections.emptyList();
+    }
+
     @Autowired
     DiscoveryClient discoveryClient;
 
+    @HystrixCommand(fallbackMethod = "getReservationNamesFallback")
     @RequestMapping(value = "/names", method = RequestMethod.GET)
     public Collection<String> getReservationNames() {
 
