@@ -9,11 +9,16 @@ import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
+import org.springframework.cloud.stream.annotation.EnableBinding;
+import org.springframework.cloud.stream.messaging.Source;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +29,7 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 @EnableCircuitBreaker
+@EnableBinding(Source.class)
 @EnableZuulProxy
 @EnableDiscoveryClient
 @SpringBootApplication
@@ -33,7 +39,7 @@ public class ReservationClientApplication {
         SpringApplication.run(ReservationClientApplication.class, args);
     }
 
-    @LoadBalanced // Service discovery will not work without this
+    @LoadBalanced // Service discovery is not working without this.
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -41,12 +47,22 @@ public class ReservationClientApplication {
 
 }
 
+
 @RestController
 @RequestMapping("/reservations")
 class ReservationApiGatewayRestController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private Source source;
+
+    @RequestMapping(method = RequestMethod.POST)
+    public void addReservations(@RequestBody Reservation aReservation) {
+        Message<Reservation> message = MessageBuilder.withPayload(aReservation).build();
+        this.source.output().send(message);
+    }
 
     public Collection<String> getReservationNamesFallback() {
         return Collections.emptyList();
