@@ -66,8 +66,8 @@ class ReservationProcessor{
     private ReservationRepository reservationRepository;
 
     @ServiceActivator(inputChannel = Sink.INPUT)
-    public void addReservation(Reservation aReservation){
-        this.reservationRepository.save(aReservation);
+    public void addReservation(String reservationName){
+        this.reservationRepository.save(new Reservation(reservationName));
     }
 }
 

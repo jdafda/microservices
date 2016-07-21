@@ -60,7 +60,7 @@ class ReservationApiGatewayRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     public void addReservations(@RequestBody Reservation aReservation) {
-        Message<Reservation> message = MessageBuilder.withPayload(aReservation).build();
+        Message<String> message = MessageBuilder.withPayload(aReservation.getReservationName()).build();
         this.source.output().send(message);
     }
 
