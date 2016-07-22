@@ -1,6 +1,4 @@
 .idea
 .mvn
 *.iml
-mvnw
-*.cmd
 /taget
