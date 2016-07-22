@@ -60,8 +60,8 @@ class ReservationApiGatewayRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     public void addReservations(@RequestBody Reservation aReservation) {
-        Message<String> message = MessageBuilder.withPayload(aReservation.getReservationName()).build();
-        this.source.output().send(message);
+        Message<Reservation> reservationMessage = MessageBuilder.withPayload(aReservation).build();
+        this.source.output().send(reservationMessage);
     }
 
     public Collection<String> getReservationNamesFallback() {
@@ -94,9 +94,18 @@ class ReservationApiGatewayRestController {
 
 class Reservation {
     private String reservationName;
+    private Long id;
 
     public String getReservationName() {
         return reservationName;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
 
