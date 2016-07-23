@@ -4,10 +4,11 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.LoadBalancerClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.messaging.Source;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -39,7 +41,7 @@ public class ReservationClientApplication {
         SpringApplication.run(ReservationClientApplication.class, args);
     }
 
-    @LoadBalanced // Service discovery is not working without this.
+    //@LoadBalanced  - remove LoadBalanced , Added Ribbon.
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -51,6 +53,10 @@ public class ReservationClientApplication {
 @RestController
 @RequestMapping("/reservations")
 class ReservationApiGatewayRestController {
+
+
+    @Autowired
+    private LoadBalancerClient loadBalancerClient;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -81,7 +87,7 @@ class ReservationApiGatewayRestController {
         };
 
         ResponseEntity<Resources<Reservation>> entity =
-                this.restTemplate.exchange("http://reservation-service/reservations", HttpMethod.GET, null, parameterizedTypeReference);
+                this.restTemplate.exchange(getServiceURL("reservation-service") + "/reservations", HttpMethod.GET, null, parameterizedTypeReference);
 
         return entity
                 .getBody()
@@ -89,6 +95,12 @@ class ReservationApiGatewayRestController {
                 .stream()
                 .map(Reservation::getReservationName)
                 .collect(Collectors.toList());
+    }
+
+    private URI getServiceURL(String serviceName) {
+        return  loadBalancerClient
+                    .choose(serviceName)
+                    .getUri();
     }
 }
 
