@@ -1,3 +1,4 @@
-# microservices demo apps to test spring boot features.
+# microservices demo apps to test spring boot/Cloud features.
 
-This project is just copy of the Josh long microservices. Always love watching his videos.
+#Change : Added Kaka Stream
+
