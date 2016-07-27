@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 @EnableCircuitBreaker
 @EnableBinding(Source.class)
+@EnableResourceServer
 @EnableZuulProxy
 @EnableDiscoveryClient
 @SpringBootApplication
