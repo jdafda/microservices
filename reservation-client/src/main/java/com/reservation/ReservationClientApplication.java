@@ -4,7 +4,6 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -19,7 +18,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,7 +31,6 @@ import java.util.stream.Collectors;
 
 @EnableCircuitBreaker
 @EnableBinding(Source.class)
-@EnableResourceServer
 @EnableZuulProxy
 @EnableDiscoveryClient
 @SpringBootApplication
@@ -100,9 +97,9 @@ class ReservationApiGatewayRestController {
     }
 
     private URI getServiceURL(String serviceName) {
-        return  loadBalancerClient
-                    .choose(serviceName)
-                    .getUri();
+        return loadBalancerClient
+                .choose(serviceName)
+                .getUri();
     }
 }
 
